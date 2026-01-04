@@ -8,7 +8,7 @@
    - Select your repository: `Venkat-Debug/JoyfulCaller`
 
 2. **Build Configuration:**
-   In the Cloudflare Pages build settings, configure:
+   In the Cloudflare Workers build settings, configure:
    
    - **Build command (optional):** `npm run build`
    - **Deploy command:** `npx wrangler deploy`
@@ -17,12 +17,11 @@
    **Important:** In this Workers UI, there is no separate “output directory” field — the Worker serves static assets from `dist/` via `wrangler.toml`.
 
 3. **Environment Variables (if needed):**
-   - Add any required environment variables in the Cloudflare Pages dashboard
+   - Add any required environment variables in the Cloudflare dashboard
    - Under Settings → Environment Variables
 
 4. **Deploy:**
-   - Cloudflare Pages will automatically deploy on every push to your main branch
-   - Preview deployments are created for pull requests
+   - Deployments run based on your configured branch settings in Cloudflare
 
 ## Local Development with Wrangler
 
@@ -45,7 +44,6 @@ This project uses a Worker (`src/worker.ts`) that serves `dist/` and falls back 
 
 ## Additional Resources
 
-- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
-- [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/platform/functions/)
+- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
 - [Wrangler CLI Documentation](https://developers.cloudflare.com/workers/wrangler/)
 
