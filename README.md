@@ -52,9 +52,14 @@ This project is configured for Cloudflare Pages deployment:
    - Connect your Git repository (GitHub, GitLab, or Bitbucket)
 
 2. **Build Settings:**
+   In the Cloudflare Pages dashboard, configure these fields:
+   
    - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-   - **Root directory:** `/` (leave empty)
+   - **Output directory:** `dist` ⬅️ **This is the ONLY output directory field**
+   - **Root directory:** `/` (leave empty or enter `/` - this is the repository root)
+   
+   **Important:** There is only ONE output directory field in Cloudflare Pages. Enter `dist` in that field.
+   - The `public/_redirects` file handles SPA routing automatically
 
 3. **Deploy:**
    - Cloudflare Pages will automatically deploy on every push to your main branch
