@@ -43,27 +43,22 @@ The built files will be in the `dist` directory.
 
 ## Deployment
 
-### Cloudflare Pages
+### Cloudflare (Workers UI / Wrangler Deploy)
 
-This project is configured for Cloudflare Pages deployment:
+If you are using the Cloudflare build screen that has a **Deploy command** (e.g. `npx wrangler deploy`), deploy it as a Worker with static assets:
 
 1. **Connect Repository:**
-   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → Pages → Create a project
+   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → **Workers & Pages** → **Create application** → **Workers**
    - Connect your Git repository (GitHub, GitLab, or Bitbucket)
 
 2. **Build Settings:**
-   In the Cloudflare Pages dashboard, configure these fields:
-   
-   - **Build command:** `npm run build`
-   - **Output directory:** `dist` ⬅️ **This is the ONLY output directory field**
-   - **Root directory:** `/` (leave empty or enter `/` - this is the repository root)
-   
-   **Important:** There is only ONE output directory field in Cloudflare Pages. Enter `dist` in that field.
-   - The `public/_redirects` file handles SPA routing automatically
+   In the Cloudflare build settings screen you shared:
+   - **Build command (optional):** `npm run build`
+   - **Deploy command:** `npx wrangler deploy`
+   - **Path:** `/`
 
 3. **Deploy:**
-   - Cloudflare Pages will automatically deploy on every push to your main branch
-   - Preview deployments are created for pull requests
+   - Deployments will run on pushes to your configured branch in Cloudflare
 
 4. **Local Testing with Wrangler:**
    ```bash
@@ -73,11 +68,8 @@ This project is configured for Cloudflare Pages deployment:
    # Login to Cloudflare
    wrangler login
    
-   # Build the project
-   npm run build
-   
-   # Preview locally
-   npm run pages:dev
+   # Run the same flow as Cloudflare deploy
+   npm run workers:dev
    ```
 
 ### Netlify
