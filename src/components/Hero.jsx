@@ -124,22 +124,6 @@ const Hero = ({ onPlayNow }) => {
           <p className="text-base md:text-lg font-medium text-gray-500 dark:text-gray-400 italic ml-1">
             No hassle searching for physical coins - everything you need is right here.
           </p>
-          <div className="mt-12 relative h-32 w-full lg:w-[120%] -ml-4 pointer-events-none opacity-90 block lg:hidden">
-            <div className="absolute bottom-0 left-0 flex gap-2 overflow-hidden w-full">
-              {floatingNumbers.slice(0, 3).map((num, idx) => (
-                <div
-                  key={`mobile-${num}-${idx}`}
-                  className="w-12 h-12 bg-orange-200 rounded-xl transform rotate-12 shadow-md flex items-center justify-center font-bold text-orange-800 shrink-0"
-                  style={{
-                    animation: `float ${3 + idx}s ease-in-out infinite`,
-                    animationDelay: `${idx * 0.2}s`,
-                  }}
-                >
-                  {num}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         <div className="relative order-1 lg:order-2 h-[500px] flex items-center justify-center">
