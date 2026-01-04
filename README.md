@@ -41,6 +41,44 @@ npm run build
 
 The built files will be in the `dist` directory.
 
+## Deployment
+
+### Cloudflare Pages
+
+This project is configured for Cloudflare Pages deployment:
+
+1. **Connect Repository:**
+   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → Pages → Create a project
+   - Connect your Git repository (GitHub, GitLab, or Bitbucket)
+
+2. **Build Settings:**
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
+   - **Root directory:** `/` (leave empty)
+
+3. **Deploy:**
+   - Cloudflare Pages will automatically deploy on every push to your main branch
+   - Preview deployments are created for pull requests
+
+4. **Local Testing with Wrangler:**
+   ```bash
+   # Install Wrangler CLI (if not already installed)
+   npm install -g wrangler
+   
+   # Login to Cloudflare
+   wrangler login
+   
+   # Build the project
+   npm run build
+   
+   # Preview locally
+   npm run pages:dev
+   ```
+
+### Netlify
+
+This project also supports Netlify deployment (see `netlify.toml` for configuration).
+
 ## Tech Stack
 
 - **React 18** - UI framework
