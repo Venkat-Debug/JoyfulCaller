@@ -84,6 +84,9 @@ const Game = ({
     if (!settings?.voiceEnabled) return
     
     if ('speechSynthesis' in window) {
+      // Stop any queued/ongoing speech to avoid double reads
+      speechSynthesis.cancel()
+
       // Get voice personality settings
       const personality = settings?.voicePersonality || 'Friendly Female (Sarah)'
       const speed = settings?.callingSpeed || 3
@@ -112,9 +115,10 @@ const Game = ({
       utterance.rate = rate
       utterance.pitch = pitch
       
-      // Try to select voice based on personality (load voices if needed)
-      const loadVoices = () => {
-        const voices = speechSynthesis.getVoices()
+      // Try to select voice based on personality (if voices are already available).
+      // IMPORTANT: Do not speak twice (some browsers populate voices async and trigger onvoiceschanged).
+      const voices = speechSynthesis.getVoices()
+      if (voices.length > 0) {
         if (personality.includes('Female')) {
           const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Karen'))
           if (femaleVoice) utterance.voice = femaleVoice
@@ -122,16 +126,9 @@ const Game = ({
           const maleVoice = voices.find(v => v.name.includes('Male') || v.name.includes('Alex') || v.name.includes('Daniel'))
           if (maleVoice) utterance.voice = maleVoice
         }
-        speechSynthesis.speak(utterance)
       }
-      
-      // Load voices if available, otherwise use default
-      if (speechSynthesis.getVoices().length > 0) {
-        loadVoices()
-      } else {
-        speechSynthesis.onvoiceschanged = loadVoices
-        speechSynthesis.speak(utterance)
-      }
+
+      speechSynthesis.speak(utterance)
       
       // Haptics feedback
       if (settings?.haptics && navigator.vibrate) {
