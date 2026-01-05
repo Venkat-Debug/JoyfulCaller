@@ -8,6 +8,7 @@ const Game = ({
   onNavigateHome, 
   onNavigateTV,
   onNavigateSettings,
+  onSettingsChange,
   currentNumber,
   setCurrentNumber,
   calledNumbers,
@@ -140,7 +141,7 @@ const Game = ({
   }
 
   const generateRandomNumber = () => {
-    const available = Array.from({ length: 90 }, (_, i) => i + 1).filter(
+    const available = Array.from({ length: 99 }, (_, i) => i + 1).filter(
       (n) => !calledNumbers.includes(n)
     )
     if (available.length === 0) {
@@ -169,6 +170,17 @@ const Game = ({
       return
     }
     
+    // On the very first "START", speak in the same click (some browsers block speech if it only happens later in timers).
+    if (calledNumbers.length === 0) {
+      setIsPicking(true)
+      setCurrentNumber(newNumber)
+      setCalledNumbers((prev) => [...prev, newNumber])
+      setLastThree([newNumber])
+      speakNumber(newNumber, getSlang(newNumber))
+      setTimeout(() => setIsPicking(false), 350)
+      return
+    }
+
     setIsPicking(true)
     
     // Animate through numbers quickly
@@ -445,14 +457,16 @@ const Game = ({
             <div className="flex gap-2">
               <button
                 onClick={() => {
-                  if (onNavigateSettings) {
-                    onNavigateSettings()
+                  if (onActivity) onActivity()
+                  if (settings?.haptics && navigator.vibrate) navigator.vibrate(20)
+                  if (onSettingsChange) {
+                    onSettingsChange({ voiceEnabled: !(settings?.voiceEnabled ?? true) })
                   }
                 }}
                 className={`w-12 h-12 rounded-2xl bg-white dark:bg-surface-dark-lighter hover:bg-orange-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors border border-slate-100 dark:border-slate-700 shadow-sm ${
                   settings?.voiceEnabled ? 'text-primary-game' : 'text-slate-400'
                 }`}
-                title="Toggle Voice (Opens Settings)"
+                title="Toggle Voice"
               >
                 <span className="material-icons-round">
                   {settings?.voiceEnabled ? 'volume_up' : 'volume_off'}

@@ -178,6 +178,7 @@ function App() {
         onNavigateHome={navigateToHome} 
         onNavigateTV={navigateToTV}
         onNavigateSettings={navigateToSettings}
+        onSettingsChange={updateSettings}
         currentNumber={currentNumber}
         setCurrentNumber={setCurrentNumber}
         calledNumbers={calledNumbers}
@@ -197,6 +198,7 @@ function App() {
         toggleDarkMode={toggleDarkMode} 
         onNavigateBack={navigateToGame}
         onNavigateSettings={navigateToSettings}
+        onSettingsChange={updateSettings}
         currentNumber={currentNumber}
         setCurrentNumber={setCurrentNumber}
         calledNumbers={calledNumbers}
