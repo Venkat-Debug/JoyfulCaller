@@ -104,3 +104,4 @@ const GameOver = ({ onNewGame, onReset, darkMode }) => {
 
 export default GameOver
 
+
