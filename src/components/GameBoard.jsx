@@ -53,15 +53,9 @@ const GameBoard = ({ calledNumbers, settings }) => {
       },
       {
         name: 'Eighties',
-        range: [81, 89],
+        range: [81, 90],
         color: 'cyan',
-        count: calledNumbers.filter(n => n >= 81 && n <= 89).length,
-      },
-      {
-        name: 'Nineties',
-        range: [90, 99],
-        color: 'emerald',
-        count: calledNumbers.filter(n => n >= 90 && n <= 99).length,
+        count: calledNumbers.filter(n => n >= 81 && n <= 90).length,
       },
     ]
   }, [calledNumbers])

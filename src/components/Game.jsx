@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import GameBoard from './GameBoard'
+import GameOver from './GameOver'
 
 const Game = ({ 
   darkMode, 
@@ -62,15 +63,6 @@ const Game = ({
     80: "Eight and Blank",
     88: "Two Fat Ladies",
     90: "Top of the Shop",
-    91: "Top of the House",
-    92: "Nelson's Column",
-    93: "All the Threes",
-    94: "All the Fours",
-    95: "All the Fives",
-    96: "All the Sixes",
-    97: "All the Sevens",
-    98: "All the Eights",
-    99: "All the Nines",
   }
 
   const getSlang = (num) => {
@@ -138,7 +130,7 @@ const Game = ({
   }
 
   const generateRandomNumber = () => {
-    const available = Array.from({ length: 99 }, (_, i) => i + 1).filter(
+    const available = Array.from({ length: 90 }, (_, i) => i + 1).filter(
       (n) => !calledNumbers.includes(n)
     )
     if (available.length === 0) {
@@ -162,8 +154,7 @@ const Game = ({
     
     const newNumber = generateRandomNumber()
     if (newNumber === null) {
-      alert('All numbers have been called! Starting new game...')
-      handleNewGame()
+      // All numbers called - GameOver modal will show
       return
     }
     
@@ -491,7 +482,7 @@ const Game = ({
             <div>
               <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Game Board</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm">
-                99 numbers organized in friendly zones
+                90 numbers organized in friendly zones
               </p>
             </div>
             <div className="bg-white dark:bg-surface-dark-lighter px-4 py-2 rounded-full shadow-sm text-sm font-bold flex gap-3 border border-slate-100 dark:border-slate-700">
@@ -510,6 +501,25 @@ const Game = ({
 
       {/* Bottom Gradient Bar */}
       <div className="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-pink-500 to-primary-game opacity-50 z-50"></div>
+
+      {/* Game Over Modal */}
+      {calledNumbers.length === 90 && (
+        <GameOver
+          darkMode={darkMode}
+          onNewGame={() => {
+            handleResetGame()
+            if (onNewGame) {
+              onNewGame()
+            }
+          }}
+          onReset={() => {
+            handleResetGame()
+            if (onNavigateHome) {
+              onNavigateHome()
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

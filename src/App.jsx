@@ -13,12 +13,97 @@ function App() {
     if (saved !== null) return saved === 'true'
     return window.matchMedia('(prefers-color-scheme: dark)').matches
   })
-  const [currentScreen, setCurrentScreen] = useState('home') // 'home', 'game', 'tv', or 'settings'
+  // Restore current screen from localStorage, or default to 'home'
+  // If there's active game data, automatically show game screen
+  const [currentScreen, setCurrentScreen] = useState(() => {
+    const saved = localStorage.getItem('currentScreen')
+    if (saved && (saved === 'game' || saved === 'tv' || saved === 'settings')) {
+      return saved
+    }
+    // Check if there's active game data - if so, show game screen
+    const gameState = localStorage.getItem('gameState')
+    if (gameState) {
+      try {
+        const state = JSON.parse(gameState)
+        const lastActivity = state.lastActivity ? new Date(state.lastActivity).getTime() : 0
+        const now = Date.now()
+        const INACTIVITY_TIMEOUT = 5 * 60 * 1000
+        
+        // If game data exists and is recent, show game screen
+        if (now - lastActivity <= INACTIVITY_TIMEOUT && (state.currentNumber !== null || (state.calledNumbers && state.calledNumbers.length > 0))) {
+          return 'game'
+        }
+      } catch (e) {
+        // If parsing fails, default to home
+      }
+    }
+    return 'home'
+  })
   
-  // Shared game state
-  const [currentNumber, setCurrentNumber] = useState(null)
-  const [calledNumbers, setCalledNumbers] = useState([])
-  const [lastThree, setLastThree] = useState([])
+  // Shared game state - load from localStorage with activity timestamp check
+  const [currentNumber, setCurrentNumber] = useState(() => {
+    const saved = localStorage.getItem('gameState')
+    if (saved) {
+      try {
+        const gameState = JSON.parse(saved)
+        const lastActivity = gameState.lastActivity ? new Date(gameState.lastActivity).getTime() : 0
+        const now = Date.now()
+        const INACTIVITY_TIMEOUT = 5 * 60 * 1000 // 5 minutes
+        
+        // If last activity was more than 5 minutes ago, reset
+        if (now - lastActivity > INACTIVITY_TIMEOUT) {
+          localStorage.removeItem('gameState')
+          return null
+        }
+        return gameState.currentNumber || null
+      } catch (e) {
+        return null
+      }
+    }
+    return null
+  })
+  
+  const [calledNumbers, setCalledNumbers] = useState(() => {
+    const saved = localStorage.getItem('gameState')
+    if (saved) {
+      try {
+        const gameState = JSON.parse(saved)
+        const lastActivity = gameState.lastActivity ? new Date(gameState.lastActivity).getTime() : 0
+        const now = Date.now()
+        const INACTIVITY_TIMEOUT = 5 * 60 * 1000
+        
+        if (now - lastActivity > INACTIVITY_TIMEOUT) {
+          localStorage.removeItem('gameState')
+          return []
+        }
+        return gameState.calledNumbers || []
+      } catch (e) {
+        return []
+      }
+    }
+    return []
+  })
+  
+  const [lastThree, setLastThree] = useState(() => {
+    const saved = localStorage.getItem('gameState')
+    if (saved) {
+      try {
+        const gameState = JSON.parse(saved)
+        const lastActivity = gameState.lastActivity ? new Date(gameState.lastActivity).getTime() : 0
+        const now = Date.now()
+        const INACTIVITY_TIMEOUT = 5 * 60 * 1000
+        
+        if (now - lastActivity > INACTIVITY_TIMEOUT) {
+          localStorage.removeItem('gameState')
+          return []
+        }
+        return gameState.lastThree || []
+      } catch (e) {
+        return []
+      }
+    }
+    return []
+  })
   
   // Inactivity timer ref
   const inactivityTimerRef = useRef(null)
@@ -51,6 +136,22 @@ function App() {
     localStorage.setItem('gameSettings', JSON.stringify(settings))
   }, [settings])
 
+  // Save game state to localStorage whenever it changes
+  useEffect(() => {
+    const gameState = {
+      currentNumber,
+      calledNumbers,
+      lastThree,
+      lastActivity: new Date().toISOString()
+    }
+    localStorage.setItem('gameState', JSON.stringify(gameState))
+    
+    // Also save current screen if we're on game or tv screen (to maintain screen on refresh)
+    if (currentScreen === 'game' || currentScreen === 'tv') {
+      localStorage.setItem('currentScreen', currentScreen)
+    }
+  }, [currentNumber, calledNumbers, lastThree, currentScreen])
+
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark')
@@ -66,26 +167,32 @@ function App() {
 
   const navigateToGame = () => {
     setCurrentScreen('game')
+    localStorage.setItem('currentScreen', 'game')
   }
 
   const navigateToHome = () => {
     setCurrentScreen('home')
+    localStorage.setItem('currentScreen', 'home')
   }
 
   const navigateToTV = () => {
     setCurrentScreen('tv')
+    localStorage.setItem('currentScreen', 'tv')
   }
 
   const navigateToSettings = () => {
     setCurrentScreen('settings')
+    localStorage.setItem('currentScreen', 'settings')
   }
 
   const navigateBackFromSettings = () => {
     // Go back to the previous screen (game or home)
     if (currentNumber !== null || calledNumbers.length > 0) {
       setCurrentScreen('game')
+      localStorage.setItem('currentScreen', 'game')
     } else {
       setCurrentScreen('home')
+      localStorage.setItem('currentScreen', 'home')
     }
   }
 
@@ -97,6 +204,7 @@ function App() {
     setCurrentNumber(null)
     setCalledNumbers([])
     setLastThree([])
+    localStorage.removeItem('gameState')
     navigateToHome()
     resetInactivityTimer()
   }
@@ -106,6 +214,7 @@ function App() {
     setCurrentNumber(null)
     setCalledNumbers([])
     setLastThree([])
+    localStorage.removeItem('gameState')
     // Don't navigate, just reset the data
   }
 
@@ -198,6 +307,7 @@ function App() {
         toggleDarkMode={toggleDarkMode} 
         onNavigateBack={navigateToGame}
         onNavigateSettings={navigateToSettings}
+        onNewGame={handleNewGame}
         onSettingsChange={updateSettings}
         currentNumber={currentNumber}
         setCurrentNumber={setCurrentNumber}

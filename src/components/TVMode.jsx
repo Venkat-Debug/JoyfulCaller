@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
+import GameOver from './GameOver'
 
 const TVMode = ({ 
   darkMode, 
   toggleDarkMode, 
   onNavigateBack,
   onNavigateSettings,
+  onNewGame,
   currentNumber,
   setCurrentNumber,
   calledNumbers,
@@ -122,7 +124,7 @@ const TVMode = ({
   }
 
   const generateRandomNumber = () => {
-    const available = Array.from({ length: 99 }, (_, i) => i + 1).filter(
+    const available = Array.from({ length: 90 }, (_, i) => i + 1).filter(
       (n) => !calledNumbers.includes(n)
     )
     if (available.length === 0) {
@@ -146,8 +148,7 @@ const TVMode = ({
     
     const newNumber = generateRandomNumber()
     if (newNumber === null) {
-      alert('All numbers have been called! Starting new game...')
-      handleReset()
+      // All numbers called - GameOver modal will show
       return
     }
     
@@ -194,7 +195,7 @@ const TVMode = ({
     setIsPicking(false)
   }
 
-  const remaining = 99 - calledNumbers.length
+  const remaining = 90 - calledNumbers.length
 
   return (
     <div className="bg-background-light-tv dark:bg-background-dark-tv text-slate-800 dark:text-slate-100 h-screen w-screen overflow-hidden flex flex-col transition-colors duration-300 font-display-tv">
@@ -330,7 +331,7 @@ const TVMode = ({
           <div className="flex justify-between items-start mb-2 shrink-0">
             <div>
               <h2 className="text-base font-bold text-slate-700 dark:text-slate-200">Board Overview</h2>
-              <p className="text-xs text-slate-400">1-99 Standard Tambola</p>
+              <p className="text-xs text-slate-400">1-90 Standard Tambola</p>
             </div>
             <div className="flex flex-col items-end">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Previous</span>
@@ -361,7 +362,7 @@ const TVMode = ({
 
           {/* Number Grid */}
           <div className="flex-1 grid grid-cols-10 gap-1 min-h-0 pb-16" style={{ gridAutoRows: 'minmax(0, 1fr)', height: '100%' }}>
-            {Array.from({ length: 99 }, (_, i) => i + 1).map((num) => {
+            {Array.from({ length: 90 }, (_, i) => i + 1).map((num) => {
               const isPicked = calledNumbers.includes(num)
               const isCurrent = currentNumber !== null && currentNumber !== undefined && currentNumber === num
               
@@ -409,6 +410,27 @@ const TVMode = ({
           </div>
         </section>
       </main>
+
+      {/* Game Over Modal */}
+      {calledNumbers.length === 90 && (
+        <GameOver
+          darkMode={darkMode}
+          onNewGame={() => {
+            handleReset()
+            if (onNewGame) {
+              onNewGame()
+            } else if (onNavigateBack) {
+              onNavigateBack()
+            }
+          }}
+          onReset={() => {
+            handleReset()
+            if (onNavigateBack) {
+              onNavigateBack()
+            }
+          }}
+        />
+      )}
     </div>
   )
 }
